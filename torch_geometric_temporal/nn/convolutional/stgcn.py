@@ -126,11 +126,12 @@ class STConv(nn.Module):
         """
         t1 = self.temporal_conv1(X)
         # Need to apply the same graph convolution to every one snapshot in sequence
+        t1_temp = torch.zeros(t1.shape)
         for b in range(t1.size(0)):
             for t in range(t1.size(1)):
-                t1[b][t] = self.graph_conv(t1[b][t], edge_index, edge_weight)
+                t1_temp[b][t] = self.graph_conv(t1[b][t], edge_index, edge_weight)
 
-        t2 = F.relu(t1)
+        t2 = F.relu(t1_temp)
         t3 = self.temporal_conv2(t2)
         t3 = t3.permute(0,2,1,3)
         t3 = self.batch_norm(t3)
